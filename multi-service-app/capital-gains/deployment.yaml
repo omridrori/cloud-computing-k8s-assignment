@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capital-gains-deployment
+  namespace: stock-market-app
+spec:
+  replicas: 1  # Only one replica as specified
+  selector:
+    matchLabels:
+      app: capital-gains-service
+  template:
+    metadata:
+      labels:
+        app: capital-gains-service
+    spec:
+      containers:
+      - name: capital-gains
+        image: capital-gains-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: STOCKS_SERVICE_URL
+          value: "http://stocks-service:8000"  # Using k8s service discovery

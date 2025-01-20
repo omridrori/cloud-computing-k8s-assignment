@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: stock-market-app
+data:
+  nginx.conf: |
+    events {
+      use epoll;
+      worker_connections 128;
+    }
+    
+    http {
+      upstream stocks {
+        server stocks-service:8000;
+      }
+      
+      upstream capital-gains {
+        server capital-gains-service:8080;
+      }
+      
+      server {
+        listen 80;
+        
+        # Stocks routing
+        location /stocks {
+          proxy_pass http://stocks/stocks;
+        }
+        
+        location /stocks/ {
+          proxy_pass http://stocks/stocks/;
+        }
+        
+        # Capital gains routing
+        location /capital-gains {
+          proxy_pass http://capital-gains/capital-gains;
+        }
+        
+        location /capital-gains/ {
+          proxy_pass http://capital-gains/capital-gains/;
+        }
+        
+        # Default route - return 404 for unhandled requests
+        location / {
+          return 404;
+        }
+      }
+    }

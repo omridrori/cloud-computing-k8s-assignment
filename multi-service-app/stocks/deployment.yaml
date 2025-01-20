@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stocks-deployment
+  namespace: stock-market-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: stocks-service
+  template:
+    metadata:
+      labels:
+        app: stocks-service
+    spec:
+      containers:
+      - name: stocks
+        image: stocks-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: NINJA_API_KEY
+          value: "0tUBLIXCKD9HVyTvFaNePQ==ogJDd8sePpemgXxi"
+        - name: API_NINJAS_URL
+          value: "https://api.api-ninjas.com/v1/stockprice"
+        - name: MONGO_URI
+          value: "mongodb://mongodb-service:27017/stockdb"
+        - name: COLLECTION
+          value: "stock1"
