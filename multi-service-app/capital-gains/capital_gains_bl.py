@@ -3,10 +3,8 @@ from flask import jsonify
 import os
 
 # Load environment variables
-STOCKS1_URL = os.getenv("STOCKS1_URL", "http://stocks1-a:8000")
-STOCKS2_URL = os.getenv("STOCKS2_URL", "http://stocks2:8000")
-
-ALLOWED_QUERY_PARAMS = {"portfolio", "numsharesgt", "numshareslt"}
+STOCKS_URL = os.getenv("STOCKS_SERVICE_URL", "http://stocks-service:8000")
+ALLOWED_QUERY_PARAMS = {"numsharesgt", "numshareslt"}
 
 def get_stocks(url):
     """Fetch stock data from the provided URL."""
@@ -32,10 +30,10 @@ def process_capital_gains_request(request):
     """Main function to process the capital gains calculation request."""
     # Validate and extract query parameters
     params = validate_query_parameters(request)
-    portfolio, numsharesgt, numshareslt = extract_query_parameters(request)
+    numsharesgt, numshareslt = extract_query_parameters(request)
 
     # Fetch stock data
-    stock_data = fetch_stock_data(portfolio)
+    stock_data = fetch_stock_data()
 
     # Calculate capital gains
     total_gain = calculate_capital_gains(stock_data, numsharesgt, numshareslt)
@@ -53,24 +51,16 @@ def validate_query_parameters(request):
 
 def extract_query_parameters(request):
     """Extract and validate query parameters."""
-    portfolio = request.args.get("portfolio")
-    if portfolio not in (None, "stocks1", "stocks2"):
-        raise FileNotFoundError("Portfolio not found")
     numsharesgt = request.args.get("numsharesgt", type=int)
     numshareslt = request.args.get("numshareslt", type=int)
-    return portfolio, numsharesgt, numshareslt
+    return numsharesgt, numshareslt
 
 
-def fetch_stock_data(portfolio):
+def fetch_stock_data():
     """Fetch stock data from the appropriate sources."""
     stock_data = []
-    if portfolio == "stocks1":
-        stock_data.extend(augment_with_portfolio(get_stocks(STOCKS1_URL), "stocks1"))
-    elif portfolio == "stocks2":
-        stock_data.extend(augment_with_portfolio(get_stocks(STOCKS2_URL), "stocks2"))
-    else:
-        stock_data.extend(augment_with_portfolio(get_stocks(STOCKS1_URL), "stocks1"))
-        stock_data.extend(augment_with_portfolio(get_stocks(STOCKS2_URL), "stocks2"))
+    stock_data.extend(augment_with_portfolio(get_stocks(STOCKS_URL), "stocks"))
+
     return stock_data
 
 
@@ -85,8 +75,8 @@ def calculate_capital_gains(stock_data, numsharesgt, numshareslt):
     """Calculate capital gains for the provided stock data."""
     capital_gains = []
     for stock in stock_data:
-        stock_id, shares, purchase_price, portfolio = extract_stock_fields(stock)
-        current_price = fetch_current_price(stock_id, portfolio)
+        stock_id, shares, purchase_price = extract_stock_fields(stock)
+        current_price = fetch_current_price(stock_id)
 
         gain = compute_gain(shares, purchase_price, current_price)
 
@@ -101,19 +91,19 @@ def extract_stock_fields(stock):
     stock_id = str(stock.get("id"))
     shares = stock.get("shares")
     purchase_price = stock.get("purchase price")
-    portfolio = stock.get("portfolio")
+
 
     if stock_id is None or shares is None or purchase_price is None:
         raise ValueError(f"Malformed data: {shares, purchase_price, stock_id, stock}")
-    return stock_id, shares, purchase_price, portfolio
+    return stock_id, shares, purchase_price
 
 
-def fetch_current_price(stock_id, portfolio):
+def fetch_current_price(stock_id):
     """Fetch the current price of a stock."""
     try:
-        portfolio_url = STOCKS1_URL if portfolio == "stocks1" else STOCKS2_URL
+        portfolio_url = STOCKS_URL
         stock_value_data = get_stock_value(portfolio_url, stock_id)
-        current_price = stock_value_data.get("stock value")
+        current_price = stock_value_data.get("ticker")
         if current_price is None:
             raise ValueError(f"Malformed stock value data: {stock_value_data}")
         return current_price

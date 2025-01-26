@@ -4,10 +4,10 @@ metadata:
   name: nginx-service
   namespace: stock-market-app
 spec:
-  type: NodePort  # This type allows external access
+  type: NodePort
   selector:
     app: nginx
   ports:
   - port: 80
     targetPort: 80
-    # nodePort will be automatically assigned if not specified
+    nodePort: 31322

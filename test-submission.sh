@@ -1,7 +1,7 @@
 # Default values
 timeout=300
 skip_create_cluster=false
-cluster_name=test-submission
+cluster_name=kind
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do

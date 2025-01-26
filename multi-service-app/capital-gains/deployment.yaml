@@ -21,4 +21,4 @@ spec:
         - containerPort: 8080
         env:
         - name: STOCKS_SERVICE_URL
-          value: "http://stocks-service:8000"  # Using k8s service discovery
+          value: "http://stocks-service:8000"
