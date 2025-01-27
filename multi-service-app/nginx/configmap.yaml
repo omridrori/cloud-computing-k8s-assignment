@@ -30,6 +30,16 @@ data:
         location /stocks/ {
           proxy_pass http://stocks/stocks/;
         }
+    
+        # Portfolio value routing
+        location /portfolio-value {
+          proxy_pass http://stocks/portfolio-value;
+        }
+    
+        # Stock value routing
+        location /stock-value/ {
+          proxy_pass http://stocks/stock-value/;
+        }
         
         # Capital gains routing
         location /capital-gains {

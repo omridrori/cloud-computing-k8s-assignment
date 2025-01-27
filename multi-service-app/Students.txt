@@ -1,0 +1,7 @@
+Student 1:
+Name : Omri Drori
+ID: 207921719
+
+Student 2:
+Name: Niv Ben Salmon
+ID: 315073346

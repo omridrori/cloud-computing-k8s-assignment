@@ -1,0 +1,172 @@
+POST http://localhost:80/stocks/
+Content-Type: application/json
+
+{
+  "symbol": "GOOGL",
+  "purchase price": 200.2,
+  "shares": 12
+}
+
+###
+POST http://localhost:80/stocks
+Content-Type: application/json
+
+{
+  "symbol": "AAPL",
+  "purchase price": 200.2,
+  "shares": 12
+}
+
+###
+GET http://localhost:80/stocks
+
+###
+
+GET http://localhost:80/stocks/679656685480c23f3db1f19b
+###
+
+DELETE http://localhost:5001/stocks/1
+
+###
+
+
+GET http://localhost:5001/stocks/2
+
+###
+PUT http://localhost:80/stocks/679656685480c23f3db1f19b
+Content-Type: application/json
+
+{
+  "id": "679656685480c23f3db1f19b",
+  "name": "Apple",
+  "purchase date": "25-01-2024",
+  "purchase price": 200.2,
+  "shares": 17,
+  "symbol": "AAPL"
+}
+
+###
+GET http://localhost:5001/stocks/2
+###
+GET http://localhost:80/stock-value/679656685480c23f3db1f19b
+
+###
+GET http://localhost:5001/portfolio-value
+
+
+###
+### Create initial stock
+POST http://localhost:5001/stocks
+Content-Type: application/json
+
+{
+  "symbol": "AAPL",
+  "purchase price": 150.50,
+  "shares": 10,
+  "name": "Apple Inc",
+  "purchase date": "24-10-2023"
+}
+
+### Verify stock was created
+GET http://localhost:5001/stocks
+
+### Get specific stock
+GET http://localhost:5001/stocks/1
+
+### Try update with mismatched ID (should fail)
+PUT http://localhost:5001/stocks/1
+Content-Type: application/json
+
+{
+  "id": "2",
+  "symbol": "AAPL",
+  "purchase price": 160.75,
+  "shares": 15,
+  "name": "Apple Inc",
+  "purchase date": "25-10-2023"
+}
+
+### Try update with missing fields (should fail)
+PUT http://localhost:5001/stocks/1
+Content-Type: application/json
+
+{
+  "id": "1",
+  "symbol": "AAPL",
+  "shares": 15
+}
+
+### Valid update with all fields
+PUT http://localhost:5001/stocks/3
+Content-Type: application/json
+
+{
+  "id": "3",
+  "symbol": "AAPL",
+  "purchase price": 160.75,
+  "shares": 15,
+  "name": "Apple Inc",
+  "purchase date": "25-10-2023"
+}
+
+### Verify update was successful
+GET http://localhost:5001/stocks/1
+
+### Try to update with duplicate symbol (should fail)
+# First create another stock
+POST http://localhost:5001/stocks
+Content-Type: application/json
+
+{
+  "symbol": "GOOGL",
+  "purchase price": 2800.00,
+  "shares": 5,
+  "name": "Alphabet Inc",
+  "purchase date": "26-10-2023"
+}
+
+### Then try to update it to use AAPL symbol
+PUT http://localhost:5001/stocks/2
+Content-Type: application/json
+
+{
+  "id": "2",
+  "symbol": "AAPL",
+  "purchase price": 2900.00,
+  "shares": 6,
+  "name": "Alphabet Inc",
+  "purchase date": "26-10-2023"
+}
+
+### Check stock value
+GET http://localhost:80/stock-value/679656685480c23f3db1f19b
+
+### Check portfolio value
+GET http://localhost:80/portfolio-value
+
+### Try to update non-existent stock (should fail)
+PUT http://localhost:5001/stocks/999
+Content-Type: application/json
+
+{
+  "id": "999",
+  "symbol": "MSFT",
+  "purchase price": 330.50,
+  "shares": 20,
+  "name": "Microsoft Corporation",
+  "purchase date": "27-10-2023"
+}
+
+### Clean up - delete stock
+DELETE http://localhost:5001/stocks/1
+
+### Verify deletion
+GET http://localhost:80/stocks
+
+### Capital-Gains
+GET http://localhost:80/capital-gains
+
+### Capital-Gains
+GET http://localhost:80/capital-gains?numshareslt=18&numsharesgt=13
+
+
